@@ -29,7 +29,7 @@ public class IntegerStringUtility {
 
             // Shift elements of the sorted portion that are greater than 'current' to the right
             while (j >= 0 && cmp.compare(array[j], current) > 0) {
-                array[i + 1] = array[j]; // shift element rightward
+                array[j + 1] = array[j]; // shift element rightward
                 j--; // move to the previous element on the left
             }
 
@@ -107,13 +107,15 @@ public class IntegerStringUtility {
      */
     public static class StringSimilarityComparator implements Comparator<String> {
         //compare the amount of same integer char values in each string
+
         /**
          * Compares two positive integer strings using Similarity (compares whether the same integer char values
          * can be found in both Strings).
          * If the two strings are different lengths,
          * they are not similar, and the shorter string comes before the longer one. If the two strings
          * are the same length, then their characters are sorted, then compared lexicographically to detemrine
-         *  their character similarity.
+         * their character similarity.
+         *
          * @param n1 the first String to be compared.
          * @param n2 the second String to be compared.
          * @return -1 if n1 is shorter than n2,
@@ -125,8 +127,7 @@ public class IntegerStringUtility {
         public int compare(String n1, String n2) {
             if (n1.length() < n2.length()) { //the shorter string comes before the longer string
                 return -1;
-            }
-            else if (n1.length() == n2.length()) { //if the same size but NOT similar, break the tie with
+            } else if (n1.length() == n2.length()) { //if the same size but NOT similar, break the tie with
                 //lexicographical comparison (The sorted order of characters are compared lexicographically)
 
                 //Make a sorted Char[] of each number's characters
@@ -134,23 +135,22 @@ public class IntegerStringUtility {
                 //the natural ordering for Character
                 Character[] n1CharArr = new Character[n1.length()];
                 Character[] n2CharArr = new Character[n2.length()];
-                for(int i = 0; i < n1.length(); i++){
+                for (int i = 0; i < n1.length(); i++) {
                     n1CharArr[i] = n1.charAt(i);
-                    n2CharArr[i] = n1.charAt(i);
+                    n2CharArr[i] = n2.charAt(i);
                 }
                 insertionSort(n1CharArr, charComparator);
                 insertionSort(n2CharArr, charComparator);
 
                 //Compare the sorted Char[]
-                for(int i = 0; i < n1CharArr.length; i++){
+                for (int i = 0; i < n1CharArr.length; i++) {
                     int comparison = n1CharArr[i].compareTo(n2CharArr[i]);
-                    if (comparison != 0){
+                    if (comparison != 0) {
                         return comparison;
                     }
                 }
                 return 0; //getting here means that all the Char[] elements were equal, therefore making the Strings similar.
-            }
-            else { //the longer string comes after
+            } else { //the longer string comes after
                 return 1;
             }
         }
@@ -180,7 +180,7 @@ public class IntegerStringUtility {
                 String n1LargestVal = findMax(n1, compareNumerical);
                 String n2LargestVal = findMax(n2, compareNumerical);
 
-                StringSimilarityComparator compareLargests = new StringSimilarityComparator();
+                StringNumericalValueComparator compareLargests = new StringNumericalValueComparator();
                 return compareLargests.compare(n1LargestVal, n2LargestVal);
             } else if (n1.length > n2.length) { // Check if we need these comparisons
                 return 1;
@@ -191,6 +191,12 @@ public class IntegerStringUtility {
     }
 
 
+    /**
+     * Computes and returns the similarity groups for the given array of integer strings.
+     *
+     * @param array - the input array of positive integer strings
+     * @return a 2D string array where each row is a similarity group, or an empty 2D array if input is null or empty
+     */
     public static String[][] getSimilarityGroups(String[] array) {
         // Base case: Check for null or empty input array
         if (array == null || array.length == 0) {
@@ -200,6 +206,7 @@ public class IntegerStringUtility {
         // Create a copy of the array
         String[] copyArray = array.clone();
 
+        // Sort using insertionSort and StringSimilarityComparator
         StringSimilarityComparator cmp = new StringSimilarityComparator();
         insertionSort(copyArray, cmp);
 
@@ -211,17 +218,55 @@ public class IntegerStringUtility {
             }
         }
 
+        // Allocate the 2D array with the total number of unique groups (rows)
         String[][] groups = new String[groupCount][];
-        int groupIndex = 0;
-        int start = 0;
+        int groupIndex = 0; // track the current row in 2D result array
+        int start = 0; // track the starting index of current group in copyArray
 
+        // Partition sorted array into similarity group rows
+        for (int i = 1; i <= copyArray.length; i++) {
+            // Detect group boundary: end of array or adjacent elements are not similar
+            if (i == copyArray.length || cmp.compare(copyArray[i - 1], copyArray[i]) != 0) {
+                int groupSize = i - start; // calculate number of elements in this group
+                groups[groupIndex] = new String[groupSize]; // create a new row of exact group size
 
+                // Copy elements belonging to this group into the 2D array row
+                for (int j = 0; j < groupSize; j++) {
+                    groups[groupIndex][j] = copyArray[start + j];
+                }
 
+                groupIndex++; // move to the next row in 2D array
+                start = i; // update start index for the next group
+            }
+        }
+
+        return groups;
     }
 
-    public static String[] findMaximumSimilarityGroup(int[] intArr){
-        // Create a copy of the array
+    /**
+     * Returns the largest similarity group in the input array.
+     *
+     * @param intArr - the input array of primitive integers
+     * @return a String array containing the largest similarity group, or an empty array if input is null or empty
+     */
+    public static String[] findMaximumSimilarityGroup(int[] intArr) {
+        // Base case: Check for null or empty input array
+        if (intArr == null || intArr.length == 0) {
+            return new String[0];
+        }
 
+        // Convert the primitive int array into a String array
+        String[] strArray = new String[intArr.length];
+        for (int i = 0; i < intArr.length; i++) {
+            strArray[i] = String.valueOf(intArr[i]); // convert each int to String
+        }
+
+        // Obtain all similarity groups from the coverted String array
+        String[][] groups = getSimilarityGroups(strArray);
+
+        // Find and return the maximum similarity group using findMax and StringSimilarityComparator
+        StringSimilarityGroupComparator groupCmp = new StringSimilarityGroupComparator();
+        return findMax(groups, groupCmp);
     }
 
 }
