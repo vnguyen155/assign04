@@ -99,4 +99,72 @@ public class IntegerStringUtilityTest {
 		// 987 is the largest
 		assertArrayEquals(new String[] { "987", "789", "879" }, group);
 	}
+
+	@Test
+	public void insertionSort() {
+		String[] arr = { "5", "3", "02", "1", "04" };
+		String[] expected = { "1", "02", "3", "04", "5" };
+		IntegerStringUtility.insertionSort(arr, numericalCmp);
+		assertTrue(Arrays.equals(arr, expected));
+	}
+
+	@Test
+	public void stringNumericalValueComparatorSame() {
+		String n1 = "5432";
+		String n2 = "5432";
+		int result = numericalCmp.compare(n1, n2);
+		assertTrue((result == 0));
+	}
+
+	@Test
+	public void stringSimilarityComparatorComesAfter() {
+		String n1 = "1235";
+		String n2 = "3421";
+		int result = similarityCmp.compare(n1, n2);
+		assertTrue((result > 0));
+	}
+
+	@Test
+	public void stringSimilarityComparatorSimilar() {
+		String n1 = "1234";
+		String n2 = "3421";
+		int result = similarityCmp.compare(n1, n2);
+		assertTrue((result == 0));
+	}
+
+	@Test
+	public void stringSimilarityComparatorComesBefore() {
+		String n1 = "3421";
+		String n2 = "11111";
+		int result = similarityCmp.compare(n1, n2);
+		assertTrue((result < 0));
+	}
+
+	@Test
+	public void stringSimilarityGroupComparatorLargerTrue() {
+		int result = groupCmp.compare(new String[] { "3421", "1234", "4321" }, new String[] { "987", "789" });
+		assertTrue((result > 0));
+	}
+
+	@Test
+	public void stringSimilarityGroupComparatorSmallerTrue() {
+		int result = groupCmp.compare(new String[] { "3421", "1234", "4321" }, new String[] { "1235", "5321", "2153" });
+		assertTrue((result < 0));
+	}
+
+	@Test
+	public void stringSimilarityGroupComparatorSimilarTrue() {
+		int result = groupCmp.compare(new String[] { "3421", "1234", "4321" }, new String[] { "1234", "4321", "3421" });
+		assertTrue((result == 0));
+	}
+
+	// -------------------------------------------------------------------------
+	// ADDITIONAL TESTS
+	// -------------------------------------------------------------------------
+	@Test
+	public void testInsertionSortEmptyArrayReturnNull() {
+		Integer[] array = {};
+		IntegerStringUtility.insertionSort(array, numericalCmp);
+		assertEquals(0, array.length);
+	}
 }

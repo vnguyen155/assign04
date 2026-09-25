@@ -106,8 +106,6 @@ public class IntegerStringUtility {
      * Comparator that defines the Similarity comparison of positive integer values (represented as Strings.)
      */
     public static class StringSimilarityComparator implements Comparator<String> {
-        //compare the amount of same integer char values in each string
-
         /**
          * Compares two positive integer strings using Similarity (compares whether the same integer char values
          * can be found in both Strings).
@@ -123,16 +121,20 @@ public class IntegerStringUtility {
          * or the comparison of n1 and n2s' Char[] values if n1 and n2 are the same length,
          * or 0 if n1 and n2 are the same length and equal.
          */
+
+        // compare the amount of same integer char values in each string
+        // define the comparison of integer Strings by SIMILARITY
         @Override
         public int compare(String n1, String n2) {
-            if (n1.length() < n2.length()) { //the shorter string comes before the longer string
+            if (n1.length() < n2.length()) { // the shorter string comes before the longer string
                 return -1;
-            } else if (n1.length() == n2.length()) { //if the same size but NOT similar, break the tie with
-                //lexicographical comparison (The sorted order of characters are compared lexicographically)
+            } else if (n1.length() == n2.length()) { // if the same size but NOT similar, break the tie with
+                // lexicographical comparison (The sorted order of characters are compared
+                // lexicographically)
 
-                //Make a sorted Char[] of each number's characters
-                Comparator<Character> charComparator = Comparator.naturalOrder(); //using a comparator that invokes
-                //the natural ordering for Character
+                // Make a sorted Char[] of each number's characters
+                Comparator<Character> charComparator = Comparator.naturalOrder(); // using a comparator that invokes
+                // the natural ordering for Character
                 Character[] n1CharArr = new Character[n1.length()];
                 Character[] n2CharArr = new Character[n2.length()];
                 for (int i = 0; i < n1.length(); i++) {
@@ -142,15 +144,17 @@ public class IntegerStringUtility {
                 insertionSort(n1CharArr, charComparator);
                 insertionSort(n2CharArr, charComparator);
 
-                //Compare the sorted Char[]
+                // Compare the sorted Char[]
                 for (int i = 0; i < n1CharArr.length; i++) {
                     int comparison = n1CharArr[i].compareTo(n2CharArr[i]);
                     if (comparison != 0) {
                         return comparison;
                     }
                 }
-                return 0; //getting here means that all the Char[] elements were equal, therefore making the Strings similar.
-            } else { //the longer string comes after
+                return 0; // getting here means that all the Char[] elements were equal, therefore making
+                // the Strings similar.
+            }
+            else { // the longer string comes after
                 return 1;
             }
         }
